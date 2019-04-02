@@ -1,0 +1,21 @@
+<resources>
+    <string name="app_name">Zeitplan</string>
+    <string name="title_activity_add">Add Schedule</string>
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Schedule</string>
+    <string name="title_notifications">Setting</string>
+
+    <string name="title_menu_delete">Delete</string>
+    <string name="title_menu_save">Save</string>
+
+    <string name="notification_title">AYO KULIAH GUYS!</string>
+
+    <array name="hari">
+        <item>Senin</item>
+        <item>Selasa</item>
+        <item>Rabu</item>
+        <item>Kamis</item>
+        <item>Jumat</item>
+        <item>Sabtu</item>
+    </array>
+</resources>
