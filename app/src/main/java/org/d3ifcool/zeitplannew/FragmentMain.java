@@ -40,7 +40,7 @@ public class FragmentMain extends Fragment implements LoaderManager.LoaderCallba
 
     Context appContext = MainActivity.getContextOfApplication();
 
-    private TextView tvToday,tvTime;
+    private TextView tvToday;
     private FloatingActionButton fabAdd;
     private JadwalDbHelper helper;
     private JadwalCursorAdapter mCursorAdapter;
