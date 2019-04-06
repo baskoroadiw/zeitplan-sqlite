@@ -56,33 +56,35 @@ public class FragmentSchedule extends Fragment {
         Cursor cursor = appContext.getContentResolver().query(JadwalContract.JadwalEntry.CONTENT_URI,projection,null, null,null);
         while (cursor.moveToNext()){
             cursorHari = cursor.getString(cursor.getColumnIndex(JadwalContract.JadwalEntry.COLUMN_HARI));
-            if (cursorHari.equals("Senin")){
-                btnSenin.setEnabled(true);
-                btnSenin.setBackgroundResource(R.drawable.shadow);
-            }else if (cursorHari.equals("Selasa")){
-                btnSelasa.setEnabled(true);
-                btnSelasa.setBackgroundResource(R.drawable.shadow);
-            }else if (cursorHari.equals("Rabu")){
-                btnRabu.setEnabled(true);
-                btnRabu.setBackgroundResource(R.drawable.shadow);
-            }else if (cursorHari.equals("Kamis")){
-                btnKamis.setEnabled(true);
-                btnKamis.setBackgroundResource(R.drawable.shadow);
-            }else if (cursorHari.equals("Jumat")){
-                btnJumat.setEnabled(true);
-                btnJumat.setBackgroundResource(R.drawable.shadow);
-            }else if (cursorHari.equals("Sabtu")){
-                btnSabtu.setEnabled(true);
-                btnSabtu.setBackgroundResource(R.drawable.shadow);
+            if (cursorHari!=null){
+                if (cursorHari.equals("Senin")){
+                    btnSenin.setEnabled(true);
+                    btnSenin.setBackgroundResource(R.drawable.shadow);
+                }else if (cursorHari.equals("Selasa")){
+                    btnSelasa.setEnabled(true);
+                    btnSelasa.setBackgroundResource(R.drawable.shadow);
+                }else if (cursorHari.equals("Rabu")){
+                    btnRabu.setEnabled(true);
+                    btnRabu.setBackgroundResource(R.drawable.shadow);
+                }else if (cursorHari.equals("Kamis")){
+                    btnKamis.setEnabled(true);
+                    btnKamis.setBackgroundResource(R.drawable.shadow);
+                }else if (cursorHari.equals("Jumat")){
+                    btnJumat.setEnabled(true);
+                    btnJumat.setBackgroundResource(R.drawable.shadow);
+                }else if (cursorHari.equals("Sabtu")){
+                    btnSabtu.setEnabled(true);
+                    btnSabtu.setBackgroundResource(R.drawable.shadow);
+                }
             }
-//            Log.i("Hasil Cursor",cursorHari);
         }
+        cursor.close();
 
         btnSenin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(appContext,ScheduleActivity.class);
-                intent.putExtra("hari","senin");
+                intent.putExtra("hari","Senin");
                 startActivity(intent);
             }
         });
@@ -91,7 +93,7 @@ public class FragmentSchedule extends Fragment {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(appContext,ScheduleActivity.class);
-                intent.putExtra("hari","selasa");
+                intent.putExtra("hari","Selasa");
                 startActivity(intent);
             }
         });
@@ -100,7 +102,7 @@ public class FragmentSchedule extends Fragment {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(appContext,ScheduleActivity.class);
-                intent.putExtra("hari","rabu");
+                intent.putExtra("hari","Rabu");
                 startActivity(intent);
             }
         });
@@ -109,7 +111,7 @@ public class FragmentSchedule extends Fragment {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(appContext,ScheduleActivity.class);
-                intent.putExtra("hari","kamis");
+                intent.putExtra("hari","Kamis");
                 startActivity(intent);
             }
         });
@@ -118,7 +120,7 @@ public class FragmentSchedule extends Fragment {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(appContext,ScheduleActivity.class);
-                intent.putExtra("hari","jumat");
+                intent.putExtra("hari","Jumat");
                 startActivity(intent);
             }
         });
@@ -127,17 +129,10 @@ public class FragmentSchedule extends Fragment {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(appContext,ScheduleActivity.class);
-                intent.putExtra("hari","sabtu");
+                intent.putExtra("hari","Sabtu");
                 startActivity(intent);
             }
         });
-
-
-
-
-
-
-
 
         return view;
     }

@@ -31,7 +31,7 @@
         app:layout_constraintTop_toBottomOf="@+id/tv_mata_kuliah" />
 
     <TextView
-        android:id="@+id/tv_waktu"
+        android:id="@+id/tv_detail_waktu"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"
