@@ -30,7 +30,6 @@ public final class JadwalContract {
 
         public static final String COLUMN_HARI = "hari";
         public static final String COLUMN_MATAKULIAH = "matakuliah";
-        public static final String COLUMN_KELAS = "kelas";
         public static final String COLUMN_DOSEN = "dosen";
         public static final String COLUMN_RUANGAN = "ruangan";
         public static final String COLUMN_TANGGAL = "tanggal";

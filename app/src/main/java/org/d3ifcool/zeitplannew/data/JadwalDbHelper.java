@@ -21,7 +21,6 @@ public class JadwalDbHelper extends SQLiteOpenHelper {
                 JadwalContract.JadwalEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 JadwalContract.JadwalEntry.COLUMN_HARI + " TEXT, " +
                 JadwalContract.JadwalEntry.COLUMN_MATAKULIAH + " TEXT, " +
-                JadwalContract.JadwalEntry.COLUMN_KELAS + " TEXT, " +
                 JadwalContract.JadwalEntry.COLUMN_DOSEN + " TEXT, " +
                 JadwalContract.JadwalEntry.COLUMN_RUANGAN + " TEXT, " +
                 JadwalContract.JadwalEntry.COLUMN_TANGGAL + " TEXT, " +

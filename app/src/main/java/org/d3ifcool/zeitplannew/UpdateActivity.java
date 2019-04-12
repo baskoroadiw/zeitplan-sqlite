@@ -1,16 +1,20 @@
 package org.d3ifcool.zeitplannew;
 
+import android.app.AlertDialog;
 import android.app.TimePickerDialog;
 import android.content.ContentValues;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.LoaderManager;
 import android.support.v4.app.NavUtils;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextUtils;
@@ -30,7 +34,9 @@ import org.d3ifcool.zeitplannew.reminder.AlarmScheduler;
 
 import java.util.Calendar;
 
-public class AddActivity extends AppCompatActivity {
+public class UpdateActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
+
+    private static final int EXISTING_ZEITPLAN_LOADER = 0;
 
     //constant values in milliseconds
     private static final long milMinute = 60000L;
@@ -45,6 +51,7 @@ public class AddActivity extends AppCompatActivity {
     private String mataKuliah, dosen, ruangan, hari, mDate, mTime;
     private long mRepeatTime;
     TimePicker timePicker;
+    private Uri mCurrentReminderUri;
     private int mYear, mMonth, mHour, mMinute, mDay;
     private Calendar mCalendar;
     private Button buttonTime;
@@ -52,7 +59,17 @@ public class AddActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_add);
+        setContentView(R.layout.activity_update);
+
+        Intent intent = getIntent();
+        mCurrentReminderUri = intent.getData();
+        Log.i("URII", mCurrentReminderUri.toString());
+
+        if (mCurrentReminderUri == null) {
+            invalidateOptionsMenu();
+        }else{
+            LoaderManager.getInstance(this).initLoader(EXISTING_ZEITPLAN_LOADER, null, this);
+        }
 
         //initialize View
         spinnerHari = findViewById(R.id.spinnerHari);
@@ -94,7 +111,7 @@ public class AddActivity extends AppCompatActivity {
         //Toolbar
         mtoolbar = findViewById(R.id.toolbar);
         setSupportActionBar(mtoolbar);
-        getSupportActionBar().setTitle(R.string.title_activity_add);
+        getSupportActionBar().setTitle(R.string.title_activity_update);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
 
@@ -106,7 +123,11 @@ public class AddActivity extends AppCompatActivity {
         buttonTime.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                TimePickerDialog tpd = new TimePickerDialog(AddActivity.this, new TimePickerDialog.OnTimeSetListener() {
+                if(mCurrentReminderUri == null){
+                    Toast.makeText(UpdateActivity.this, "click again on the reminder list to set time alarm", Toast.LENGTH_LONG).show();
+                    return;
+                }
+                TimePickerDialog tpd = new TimePickerDialog(UpdateActivity.this, new TimePickerDialog.OnTimeSetListener() {
                     @Override
                     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
                         mHour = hourOfDay;
@@ -137,12 +158,16 @@ public class AddActivity extends AppCompatActivity {
     public boolean onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
 
+        if (mCurrentReminderUri == null){
+            MenuItem menuItem = menu.findItem(R.id.delete_reminder);
+            menuItem.setVisible(false);
+        }
         return true;
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_add_reminder,menu);
+        getMenuInflater().inflate(R.menu.menu_update_reminder,menu);
         return true;
     }
 
@@ -152,11 +177,54 @@ public class AddActivity extends AppCompatActivity {
             case R.id.save_reminder:
                 saveSchedule();
                 finish();
+//                Log.i("TIMEEEEE",mTime);
+                return true;
+            case R.id.delete_reminder:
+                showDeleteConfirmationDialog();
                 return true;
             case android.R.id.home:
-                NavUtils.navigateUpFromSameTask(AddActivity.this);
+                NavUtils.navigateUpFromSameTask(UpdateActivity.this);
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void showDeleteConfirmationDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Yakin ingin menghapus jadwal?");
+        builder.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                // User clicked the "Delete" button, so delete the reminder.
+                deleteReminder();
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                // User clicked the "Cancel" button, so dismiss the dialog
+                // and continue editing the reminder.
+                if (dialog != null) {
+                    dialog.dismiss();
+                }
+            }
+        });
+
+        // Create and show the AlertDialog
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
+
+    private void deleteReminder() {
+        if (mCurrentReminderUri != null){
+            int rowsDeleted = getContentResolver().delete(mCurrentReminderUri,null, null);
+            new AlarmScheduler().cancelAlarm(this,mCurrentReminderUri);
+
+            if (rowsDeleted == 0){
+                Toast.makeText(this, "Error Deleting", Toast.LENGTH_SHORT).show();
+            }else{
+                Toast.makeText(this, "Schedule Deleted", Toast.LENGTH_SHORT).show();
+            }
+        }
+
+        finish();
     }
 
     private void saveSchedule() {
@@ -190,17 +258,95 @@ public class AddActivity extends AppCompatActivity {
         mCalendar.set(Calendar.SECOND, 0);
 
         long selectedTimestamp =  mCalendar.getTimeInMillis();
+        Log.i("zeitplan time miles", "saveSchedule: "+selectedTimestamp);
 
         mRepeatTime = 1*milMinute;
 
+        if (mCurrentReminderUri == null){
             Uri newUri = getContentResolver().insert(JadwalContract.JadwalEntry.CONTENT_URI,values);
 
             if (newUri == null){
                 Toast.makeText(this, "Error Saving Schedule", Toast.LENGTH_SHORT).show();
+            }else{
+                Toast.makeText(this, "Schedule Saved", Toast.LENGTH_SHORT).show();
             }
-        
-        new AlarmScheduler().setRepeatAlarm(getApplicationContext(),selectedTimestamp, JadwalContract.JadwalEntry.CONTENT_URI,mRepeatTime);
+        }else{
+            int rowsAffected = getContentResolver().update(mCurrentReminderUri, values, null, null);
 
-        Toast.makeText(getApplicationContext(), "Schedule Saved", Toast.LENGTH_SHORT).show();
+            if (rowsAffected == 0){
+                Toast.makeText(this, "Error updating", Toast.LENGTH_SHORT).show();
+            }else{
+                Toast.makeText(this, "Schedule Updated", Toast.LENGTH_SHORT).show();
+            }
+        }
+        
+        new AlarmScheduler().setRepeatAlarm(getApplicationContext(),selectedTimestamp,mCurrentReminderUri,mRepeatTime);
+
+        Toast.makeText(getApplicationContext(), "Saved", Toast.LENGTH_SHORT).show();
+    }
+
+    @NonNull
+    @Override
+    public Loader<Cursor> onCreateLoader(int i, @Nullable Bundle bundle) {
+
+        String[] projection = {
+                JadwalContract.JadwalEntry.COLUMN_HARI, hari,
+                JadwalContract.JadwalEntry.COLUMN_MATAKULIAH, mataKuliah,
+                JadwalContract.JadwalEntry.COLUMN_DOSEN, dosen,
+                JadwalContract.JadwalEntry.COLUMN_RUANGAN, ruangan,
+                JadwalContract.JadwalEntry.COLUMN_TANGGAL, mDate,
+                JadwalContract.JadwalEntry.COLUMN_WAKTU, mTime
+        };
+
+        return new CursorLoader(this, mCurrentReminderUri, projection, null, null, null);
+    }
+
+    @Override
+    public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor cursor) {
+        if (cursor == null || cursor.getCount() < 1) {
+            return;
+        }
+
+        if (cursor.moveToFirst()){
+            int mataKuliahColumnIndex = cursor.getColumnIndex(JadwalContract.JadwalEntry.COLUMN_MATAKULIAH);
+            int ruanganColumnIndex = cursor.getColumnIndex(JadwalContract.JadwalEntry.COLUMN_RUANGAN);
+            int waktuColumnIndex = cursor.getColumnIndex(JadwalContract.JadwalEntry.COLUMN_WAKTU);
+            int dosenColumnIndex = cursor.getColumnIndex(JadwalContract.JadwalEntry.COLUMN_DOSEN);
+            int hariColumnIndex = cursor.getColumnIndex(JadwalContract.JadwalEntry.COLUMN_HARI);
+
+            String mataKuliah = cursor.getString(mataKuliahColumnIndex);
+            String ruangan = cursor.getString(ruanganColumnIndex);
+            String waktu = cursor.getString(waktuColumnIndex);
+            String dosen = cursor.getString(dosenColumnIndex);
+            String hari = cursor.getString(hariColumnIndex);
+
+            if (hari !=null){
+                int position=0;
+                if (hari.equalsIgnoreCase("senin")){
+                    position = 0;
+                }else if (hari.equalsIgnoreCase("selasa")){
+                    position = 1;
+                }else if (hari.equalsIgnoreCase("rabu")){
+                    position = 2;
+                }else if (hari.equalsIgnoreCase("kamis")){
+                    position = 3;
+                }else if (hari.equalsIgnoreCase("jumat")){
+                    position = 4;
+                }else if (hari.equalsIgnoreCase("sabtu")){
+                    position = 5;
+                }
+                spinnerHari.setSelection(position);
+            }
+
+            editTextMatakuliah.setText(mataKuliah);
+            editTextDosen.setText(dosen);
+            editTextRuangan.setText(ruangan);
+            editTextWaktu.setText(waktu);
+        }
+    }
+
+    @Override
+    public void onLoaderReset(@NonNull Loader<Cursor> loader) {
+
     }
 }

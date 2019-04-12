@@ -1,7 +1,12 @@
 package org.d3ifcool.zeitplannew;
 
+import android.content.ContentUris;
 import android.content.Context;
+import android.content.Intent;
+import android.database.Cursor;
+import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.support.constraint.ConstraintLayout;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,17 +14,18 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import org.d3ifcool.zeitplannew.data.Jadwal;
+import org.d3ifcool.zeitplannew.data.JadwalContract;
 
 import java.util.ArrayList;
 
 public class DetailAdapter extends RecyclerView.Adapter<DetailAdapter.ViewHolder> {
 
     Context mContext;
-    ArrayList<Jadwal> listJadwal;
+    Cursor mCursor;
 
-    public DetailAdapter(Context mContext, ArrayList<Jadwal> listJadwal) {
+    public DetailAdapter(Context mContext, Cursor mCursor) {
         this.mContext = mContext;
-        this.listJadwal = listJadwal;
+        this.mCursor = mCursor;
     }
 
     @NonNull
@@ -31,22 +37,49 @@ public class DetailAdapter extends RecyclerView.Adapter<DetailAdapter.ViewHolder
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder viewHolder, int i) {
-        Jadwal jadwal = listJadwal.get(i);
+        if (!mCursor.moveToPosition(i)){
+            return;
+        }
 
-        viewHolder.detailMatkul.setText(jadwal.getMatakuliah());
-        viewHolder.detailRuangan.setText(jadwal.getRuangan());
-        viewHolder.detailDosen.setText(jadwal.getDosen());
-        viewHolder.detailWaktu.setText(jadwal.getWaktu());
+        int waktuColumnIndex = mCursor.getColumnIndex(JadwalContract.JadwalEntry.COLUMN_WAKTU);
+        int dosenColumnIndex = mCursor.getColumnIndex(JadwalContract.JadwalEntry.COLUMN_DOSEN);
+        int matakuliahColumnIndex = mCursor.getColumnIndex(JadwalContract.JadwalEntry.COLUMN_MATAKULIAH);
+        int ruanganColumnIndex = mCursor.getColumnIndex(JadwalContract.JadwalEntry.COLUMN_RUANGAN);
+
+        String waktu = mCursor.getString(waktuColumnIndex);
+        String dosen = mCursor.getString(dosenColumnIndex);
+        String matakuliah = mCursor.getString(matakuliahColumnIndex);
+        String ruangan = mCursor.getString(ruanganColumnIndex);
+        final long id = mCursor.getLong(mCursor.getColumnIndex(JadwalContract.JadwalEntry._ID));
+
+        viewHolder.detailMatkul.setText(matakuliah);
+        viewHolder.detailRuangan.setText(ruangan);
+        viewHolder.detailWaktu.setText(waktu);
+        viewHolder.detailDosen.setText(dosen);
+        viewHolder.itemView.setTag(id);
+
+        viewHolder.constraintLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(mContext, UpdateActivity.class);
+
+                Uri currentZeitplanUri = ContentUris.withAppendedId(JadwalContract.JadwalEntry.CONTENT_URI, id);
+                intent.setData(currentZeitplanUri);
+
+                mContext.startActivity(intent);
+            }
+        });
     }
 
     @Override
     public int getItemCount() {
-        return listJadwal.size();
+        return mCursor.getCount();
     }
 
     class ViewHolder extends RecyclerView.ViewHolder{
 
         final TextView detailDosen, detailWaktu, detailMatkul, detailRuangan;
+        final ConstraintLayout constraintLayout;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -55,6 +88,7 @@ public class DetailAdapter extends RecyclerView.Adapter<DetailAdapter.ViewHolder
             detailWaktu = itemView.findViewById(R.id.tv_detail_waktu);
             detailMatkul = itemView.findViewById(R.id.tv_detail_matkul);
             detailRuangan = itemView.findViewById(R.id.tv_detail_ruangan);
+            constraintLayout = itemView.findViewById(R.id.constraintLayout);
         }
     }
 }

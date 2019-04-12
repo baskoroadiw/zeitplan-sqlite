@@ -1,6 +1,5 @@
 package org.d3ifcool.zeitplannew;
 
-import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -41,13 +40,13 @@ public class FragmentMain extends Fragment implements LoaderManager.LoaderCallba
     Context appContext = MainActivity.getContextOfApplication();
 
     private TextView tvToday;
-    private FloatingActionButton fabAdd;
     private JadwalDbHelper helper;
     private JadwalCursorAdapter mCursorAdapter;
     private Calendar mCalendar;
     private String mataKuliah = "";
     private int mYear, mMonth, mHour, mMinute, mDay;
     ListView listViewJadwal;
+    String hariIni;
     View emptyView;
 
     private static final int ZEITPLAN_LOADER = 0;
@@ -58,100 +57,14 @@ public class FragmentMain extends Fragment implements LoaderManager.LoaderCallba
         View view = inflater.inflate(R.layout.fragment_main,container,false);
 
         tvToday = view.findViewById(R.id.textViewToday);
-        fabAdd = view.findViewById(R.id.fab);
         helper = new JadwalDbHelper(appContext);
 
         listViewJadwal = view.findViewById(R.id.listView);
         emptyView = view.findViewById(R.id.empty_view);
         listViewJadwal.setEmptyView(emptyView);
 
-        mCursorAdapter = new JadwalCursorAdapter(appContext, null);
-        listViewJadwal.setAdapter(mCursorAdapter);
-
-        listViewJadwal.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent intent = new Intent(appContext, AddActivity.class);
-
-                Uri currentZeitplanUri = ContentUris.withAppendedId(JadwalContract.JadwalEntry.CONTENT_URI, id);
-
-                // Set the URI on the data field of the intent
-                intent.setData(currentZeitplanUri);
-                startActivity(intent);
-            }
-        });
-
-        mCalendar = Calendar.getInstance();
-        mHour = mCalendar.get(Calendar.HOUR_OF_DAY);
-        mMinute = mCalendar.get(Calendar.MINUTE);
-        mYear = mCalendar.get(Calendar.YEAR);
-        mMonth = mCalendar.get(Calendar.MONTH) + 1;
-        mDay = mCalendar.get(Calendar.DATE);
-
-        fabAdd.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                addMataKuliah();
-            }
-        });
-
-        LoaderManager.getInstance(this).initLoader(ZEITPLAN_LOADER, null, this);
-
-        today();
-
-        return view;
-    }
-
-    private void addMataKuliah() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext(),R.style.Theme_AppCompat_Light_Dialog_MinWidth);
-        builder.setTitle("Tambahkan Mata Kuliah");
-
-        final EditText input = new EditText(appContext);
-        input.setInputType(InputType.TYPE_CLASS_TEXT);
-        builder.setView(input);
-
-        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                if (TextUtils.isEmpty(input.getText().toString().trim())){
-                    return;
-                }
-
-                mataKuliah = input.getText().toString();
-                ContentValues values = new ContentValues();
-
-                values.put(JadwalContract.JadwalEntry.COLUMN_MATAKULIAH, mataKuliah);
-
-                Uri newUri = appContext.getContentResolver().insert(JadwalContract.JadwalEntry.CONTENT_URI, values);
-
-                restartLoader();
-
-
-                if (newUri == null) {
-                    Toast.makeText(appContext, "Setting Reminder Title failed", Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(appContext, "Mata Kuliah Ditambahkan", Toast.LENGTH_SHORT).show();
-                }
-
-            }
-        });
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.cancel();
-            }
-        });
-
-        builder.show();
-    }
-
-    private void today(){
-        Date date = Calendar.getInstance().getTime();
-        String hariIni = (String) DateFormat.format("EEEE", date); // Thursday
-        String tanggal = (String) DateFormat.format("d",   date); // 20
-        String monthNumber  = (String) DateFormat.format("M",   date); // 06
-        String year         = (String) DateFormat.format("yyyy", date); // 2013
-
+        Date dateNow = Calendar.getInstance().getTime();
+        hariIni = (String) DateFormat.format("EEEE", dateNow); // Thursday
         if (hariIni.equalsIgnoreCase("sunday")) {
             hariIni = "Minggu";
         }else if (hariIni.equalsIgnoreCase("monday")) {
@@ -167,6 +80,36 @@ public class FragmentMain extends Fragment implements LoaderManager.LoaderCallba
         }else if (hariIni.equalsIgnoreCase("saturday")) {
             hariIni = "Sabtu";
         }
+
+        mCursorAdapter = new JadwalCursorAdapter(appContext, null);
+        listViewJadwal.setAdapter(mCursorAdapter);
+
+        mCalendar = Calendar.getInstance();
+        mHour = mCalendar.get(Calendar.HOUR_OF_DAY);
+        mMinute = mCalendar.get(Calendar.MINUTE);
+        mYear = mCalendar.get(Calendar.YEAR);
+        mMonth = mCalendar.get(Calendar.MONTH) + 1;
+        mDay = mCalendar.get(Calendar.DATE);
+
+        LoaderManager.getInstance(this).initLoader(ZEITPLAN_LOADER, null, this);
+
+        today();
+
+        return view;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        today();
+    }
+
+    private void today(){
+        Date date = Calendar.getInstance().getTime();
+        String tanggal = (String) DateFormat.format("d",   date); // 20
+        String monthNumber  = (String) DateFormat.format("M",   date); // 06
+        String year         = (String) DateFormat.format("yyyy", date); // 2013
+
         int month = Integer.parseInt(monthNumber);
         String bulan = null;
         if (month == 1){
@@ -199,18 +142,20 @@ public class FragmentMain extends Fragment implements LoaderManager.LoaderCallba
     }
 
     public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
+
+        String selection = JadwalContract.JadwalEntry.COLUMN_HARI + "=?";
+        String [] selectionArgs = {hariIni};
         String[] projection = {
                 JadwalContract.JadwalEntry._ID,
                 JadwalContract.JadwalEntry.COLUMN_HARI,
                 JadwalContract.JadwalEntry.COLUMN_MATAKULIAH,
-                JadwalContract.JadwalEntry.COLUMN_KELAS,
                 JadwalContract.JadwalEntry.COLUMN_DOSEN,
                 JadwalContract.JadwalEntry.COLUMN_RUANGAN,
                 JadwalContract.JadwalEntry.COLUMN_TANGGAL,
                 JadwalContract.JadwalEntry.COLUMN_WAKTU,
                 JadwalContract.JadwalEntry.COLUMN_TIMESTAMP
         };
-        return new CursorLoader(getActivity(), JadwalContract.JadwalEntry.CONTENT_URI,projection,null,null,null);
+        return new CursorLoader(getActivity(), JadwalContract.JadwalEntry.CONTENT_URI,projection,selection,selectionArgs,null);
     }
 
 

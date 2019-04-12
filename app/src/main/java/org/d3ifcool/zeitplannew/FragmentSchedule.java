@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -24,6 +25,7 @@ public class FragmentSchedule extends Fragment {
     Context appContext = MainActivity.getContextOfApplication();
 
     Button btnSenin, btnSelasa, btnRabu, btnKamis, btnJumat, btnSabtu;
+    FloatingActionButton fab;
 
     String cursorHari;
 
@@ -31,6 +33,8 @@ public class FragmentSchedule extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_schedule,container,false);
+
+        fab = view.findViewById(R.id.fab);
 
         btnSenin = view.findViewById(R.id.button_senin);
         btnSelasa = view.findViewById(R.id.button_selasa);
@@ -52,33 +56,7 @@ public class FragmentSchedule extends Fragment {
         btnSabtu.setEnabled(false);
         btnSabtu.setBackgroundColor(Color.LTGRAY);
 
-        String[] projection = {JadwalContract.JadwalEntry.COLUMN_HARI};
-        Cursor cursor = appContext.getContentResolver().query(JadwalContract.JadwalEntry.CONTENT_URI,projection,null, null,null);
-        while (cursor.moveToNext()){
-            cursorHari = cursor.getString(cursor.getColumnIndex(JadwalContract.JadwalEntry.COLUMN_HARI));
-            if (cursorHari!=null){
-                if (cursorHari.equals("Senin")){
-                    btnSenin.setEnabled(true);
-                    btnSenin.setBackgroundResource(R.drawable.shadow);
-                }else if (cursorHari.equals("Selasa")){
-                    btnSelasa.setEnabled(true);
-                    btnSelasa.setBackgroundResource(R.drawable.shadow);
-                }else if (cursorHari.equals("Rabu")){
-                    btnRabu.setEnabled(true);
-                    btnRabu.setBackgroundResource(R.drawable.shadow);
-                }else if (cursorHari.equals("Kamis")){
-                    btnKamis.setEnabled(true);
-                    btnKamis.setBackgroundResource(R.drawable.shadow);
-                }else if (cursorHari.equals("Jumat")){
-                    btnJumat.setEnabled(true);
-                    btnJumat.setBackgroundResource(R.drawable.shadow);
-                }else if (cursorHari.equals("Sabtu")){
-                    btnSabtu.setEnabled(true);
-                    btnSabtu.setBackgroundResource(R.drawable.shadow);
-                }
-            }
-        }
-        cursor.close();
+        readData();
 
         btnSenin.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -134,6 +112,63 @@ public class FragmentSchedule extends Fragment {
             }
         });
 
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(appContext,AddActivity.class);
+                startActivity(intent);
+            }
+        });
+
         return view;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        btnSenin.setEnabled(false);
+        btnSenin.setBackgroundColor(Color.LTGRAY);
+        btnSelasa.setEnabled(false);
+        btnSelasa.setBackgroundColor(Color.LTGRAY);
+        btnRabu.setEnabled(false);
+        btnRabu.setBackgroundColor(Color.LTGRAY);
+        btnKamis.setEnabled(false);
+        btnKamis.setBackgroundColor(Color.LTGRAY);
+        btnJumat.setEnabled(false);
+        btnJumat.setBackgroundColor(Color.LTGRAY);
+        btnSabtu.setEnabled(false);
+        btnSabtu.setBackgroundColor(Color.LTGRAY);
+
+        readData();
+    }
+
+    private void readData(){
+        String[] projection = {JadwalContract.JadwalEntry.COLUMN_HARI};
+        Cursor cursor = appContext.getContentResolver().query(JadwalContract.JadwalEntry.CONTENT_URI,projection,null, null,null);
+        while (cursor.moveToNext()){
+            cursorHari = cursor.getString(cursor.getColumnIndex(JadwalContract.JadwalEntry.COLUMN_HARI));
+            if (cursorHari!=null){
+                if (cursorHari.equals("Senin")){
+                    btnSenin.setEnabled(true);
+                    btnSenin.setBackgroundResource(R.drawable.shadow);
+                }else if (cursorHari.equals("Selasa")){
+                    btnSelasa.setEnabled(true);
+                    btnSelasa.setBackgroundResource(R.drawable.shadow);
+                }else if (cursorHari.equals("Rabu")){
+                    btnRabu.setEnabled(true);
+                    btnRabu.setBackgroundResource(R.drawable.shadow);
+                }else if (cursorHari.equals("Kamis")){
+                    btnKamis.setEnabled(true);
+                    btnKamis.setBackgroundResource(R.drawable.shadow);
+                }else if (cursorHari.equals("Jumat")){
+                    btnJumat.setEnabled(true);
+                    btnJumat.setBackgroundResource(R.drawable.shadow);
+                }else if (cursorHari.equals("Sabtu")){
+                    btnSabtu.setEnabled(true);
+                    btnSabtu.setBackgroundResource(R.drawable.shadow);
+                }
+            }
+        }
+        cursor.close();
     }
 }
