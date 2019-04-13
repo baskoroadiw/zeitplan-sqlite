@@ -40,6 +40,7 @@ public class ScheduleActivity extends AppCompatActivity {
         String[] projection = {
                 JadwalContract.JadwalEntry._ID,
                 JadwalContract.JadwalEntry.COLUMN_WAKTU,
+                JadwalContract.JadwalEntry.COLUMN_WAKTU_SELESAI,
                 JadwalContract.JadwalEntry.COLUMN_DOSEN,
                 JadwalContract.JadwalEntry.COLUMN_MATAKULIAH,
                 JadwalContract.JadwalEntry.COLUMN_RUANGAN

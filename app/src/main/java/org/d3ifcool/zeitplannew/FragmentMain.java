@@ -18,6 +18,7 @@ import android.support.v7.app.AlertDialog;
 import android.text.InputType;
 import android.text.TextUtils;
 import android.text.format.DateFormat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,7 +40,7 @@ public class FragmentMain extends Fragment implements LoaderManager.LoaderCallba
 
     Context appContext = MainActivity.getContextOfApplication();
 
-    private TextView tvToday;
+    private TextView tvToday, tvDetailDosen, tvDetailRuangan, tvDetailMatkul, tvDetailWaktu, tvNoData;
     private JadwalDbHelper helper;
     private JadwalCursorAdapter mCursorAdapter;
     private Calendar mCalendar;
@@ -47,6 +48,7 @@ public class FragmentMain extends Fragment implements LoaderManager.LoaderCallba
     private int mYear, mMonth, mHour, mMinute, mDay;
     ListView listViewJadwal;
     String hariIni;
+    String timeNow;
     View emptyView;
 
     private static final int ZEITPLAN_LOADER = 0;
@@ -63,7 +65,14 @@ public class FragmentMain extends Fragment implements LoaderManager.LoaderCallba
         emptyView = view.findViewById(R.id.empty_view);
         listViewJadwal.setEmptyView(emptyView);
 
+        tvDetailDosen = view.findViewById(R.id.tv_detail_dosen);
+        tvDetailWaktu = view.findViewById(R.id.tv_detail_waktu);
+        tvDetailMatkul = view.findViewById(R.id.tv_detail_matkul);
+        tvDetailRuangan = view.findViewById(R.id.tv_detail_ruangan);
+        tvNoData = view.findViewById(R.id.tv_no_data);
+
         Date dateNow = Calendar.getInstance().getTime();
+        timeNow = (String) DateFormat.format("HH:mm", dateNow);
         hariIni = (String) DateFormat.format("EEEE", dateNow); // Thursday
         if (hariIni.equalsIgnoreCase("sunday")) {
             hariIni = "Minggu";
@@ -94,17 +103,20 @@ public class FragmentMain extends Fragment implements LoaderManager.LoaderCallba
         LoaderManager.getInstance(this).initLoader(ZEITPLAN_LOADER, null, this);
 
         today();
+        nearestSchedule();
 
         return view;
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
+    public void onResume() {
+        super.onResume();
         today();
+        nearestSchedule();
+        restartLoader();
     }
 
-    private void today(){
+    public void today(){
         Date date = Calendar.getInstance().getTime();
         String tanggal = (String) DateFormat.format("d",   date); // 20
         String monthNumber  = (String) DateFormat.format("M",   date); // 06
@@ -143,8 +155,9 @@ public class FragmentMain extends Fragment implements LoaderManager.LoaderCallba
 
     public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
 
-        String selection = JadwalContract.JadwalEntry.COLUMN_HARI + "=?";
-        String [] selectionArgs = {hariIni};
+        String selection = JadwalContract.JadwalEntry.COLUMN_HARI + "=? AND "+
+                JadwalContract.JadwalEntry.COLUMN_WAKTU + ">?";
+        String [] selectionArgs = {hariIni,timeNow};
         String[] projection = {
                 JadwalContract.JadwalEntry._ID,
                 JadwalContract.JadwalEntry.COLUMN_HARI,
@@ -170,5 +183,48 @@ public class FragmentMain extends Fragment implements LoaderManager.LoaderCallba
 
     public void restartLoader(){
         LoaderManager.getInstance(this).restartLoader(ZEITPLAN_LOADER, null, this);
+    }
+
+    public void nearestSchedule(){
+        String selection = JadwalContract.JadwalEntry.COLUMN_HARI + "=? AND "+
+                        JadwalContract.JadwalEntry.COLUMN_WAKTU_SELESAI + ">=?";
+        String [] selectionArgs = {hariIni,timeNow};
+        String orderBy = JadwalContract.JadwalEntry.COLUMN_WAKTU + " DESC";
+        String[] projection = {
+                JadwalContract.JadwalEntry._ID,
+                JadwalContract.JadwalEntry.COLUMN_HARI,
+                JadwalContract.JadwalEntry.COLUMN_MATAKULIAH,
+                JadwalContract.JadwalEntry.COLUMN_DOSEN,
+                JadwalContract.JadwalEntry.COLUMN_RUANGAN,
+                JadwalContract.JadwalEntry.COLUMN_TANGGAL,
+                JadwalContract.JadwalEntry.COLUMN_WAKTU,
+                JadwalContract.JadwalEntry.COLUMN_WAKTU_SELESAI,
+                JadwalContract.JadwalEntry.COLUMN_TIMESTAMP
+        };
+        Cursor cursor =  appContext.getContentResolver().query(JadwalContract.JadwalEntry.CONTENT_URI,projection,selection,selectionArgs,null);
+        if (cursor.moveToNext()){
+
+            tvNoData.setVisibility(View.GONE);
+
+            String matakuliah = cursor.getString(cursor.getColumnIndex(JadwalContract.JadwalEntry.COLUMN_MATAKULIAH));
+            String ruangan = cursor.getString(cursor.getColumnIndex(JadwalContract.JadwalEntry.COLUMN_RUANGAN));
+            String dosen = cursor.getString(cursor.getColumnIndex(JadwalContract.JadwalEntry.COLUMN_DOSEN));
+            String waktu = cursor.getString(cursor.getColumnIndex(JadwalContract.JadwalEntry.COLUMN_WAKTU));
+            String waktuSelesai = cursor.getString(cursor.getColumnIndex(JadwalContract.JadwalEntry.COLUMN_WAKTU_SELESAI));
+            String waktuFix = waktu + " - " +waktuSelesai;
+
+            tvDetailMatkul.setText(matakuliah);
+            tvDetailDosen.setText(dosen);
+            tvDetailRuangan.setText(ruangan);
+            tvDetailWaktu.setText(waktuFix);
+
+//            Log.i("URUTAN HARI", matakuliah+ruangan+dosen+waktu + "----------------" + timeNow);
+        }else{
+            tvNoData.setVisibility(View.VISIBLE);
+            tvDetailMatkul.setVisibility(View.GONE);
+            tvDetailDosen.setVisibility(View.GONE);
+            tvDetailRuangan.setVisibility(View.GONE);
+            tvDetailWaktu.setVisibility(View.GONE);
+        }
     }
 }

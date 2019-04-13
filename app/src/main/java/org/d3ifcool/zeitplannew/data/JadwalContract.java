@@ -34,6 +34,7 @@ public final class JadwalContract {
         public static final String COLUMN_RUANGAN = "ruangan";
         public static final String COLUMN_TANGGAL = "tanggal";
         public static final String COLUMN_WAKTU = "waktu";
+        public static final String COLUMN_WAKTU_SELESAI = "waktuselesai";
         public static final String COLUMN_TIMESTAMP = "timestamp";
     }
 

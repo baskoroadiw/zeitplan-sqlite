@@ -42,11 +42,14 @@ public class DetailAdapter extends RecyclerView.Adapter<DetailAdapter.ViewHolder
         }
 
         int waktuColumnIndex = mCursor.getColumnIndex(JadwalContract.JadwalEntry.COLUMN_WAKTU);
+        int waktuSelesaiColumnIndex = mCursor.getColumnIndex(JadwalContract.JadwalEntry.COLUMN_WAKTU_SELESAI);
         int dosenColumnIndex = mCursor.getColumnIndex(JadwalContract.JadwalEntry.COLUMN_DOSEN);
         int matakuliahColumnIndex = mCursor.getColumnIndex(JadwalContract.JadwalEntry.COLUMN_MATAKULIAH);
         int ruanganColumnIndex = mCursor.getColumnIndex(JadwalContract.JadwalEntry.COLUMN_RUANGAN);
 
         String waktu = mCursor.getString(waktuColumnIndex);
+        String waktuSelesai = mCursor.getString(waktuSelesaiColumnIndex);
+        String waktuFix = waktu + " - " + waktuSelesai;
         String dosen = mCursor.getString(dosenColumnIndex);
         String matakuliah = mCursor.getString(matakuliahColumnIndex);
         String ruangan = mCursor.getString(ruanganColumnIndex);
@@ -54,7 +57,7 @@ public class DetailAdapter extends RecyclerView.Adapter<DetailAdapter.ViewHolder
 
         viewHolder.detailMatkul.setText(matakuliah);
         viewHolder.detailRuangan.setText(ruangan);
-        viewHolder.detailWaktu.setText(waktu);
+        viewHolder.detailWaktu.setText(waktuFix);
         viewHolder.detailDosen.setText(dosen);
         viewHolder.itemView.setTag(id);
 

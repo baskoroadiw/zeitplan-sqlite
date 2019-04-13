@@ -47,14 +47,13 @@ public class UpdateActivity extends AppCompatActivity implements LoaderManager.L
 
     Toolbar mtoolbar;
     private Spinner spinnerHari;
-    private EditText editTextMatakuliah, editTextDosen, editTextRuangan, editTextWaktu;
-    private String mataKuliah, dosen, ruangan, hari, mDate, mTime;
+    private EditText editTextMatakuliah, editTextDosen, editTextRuangan, editTextWaktu, editTextWaktuSelesai;
+    private String mataKuliah, dosen, ruangan, hari, mDate, mTime, mTimeEnd;
     private long mRepeatTime;
     TimePicker timePicker;
     private Uri mCurrentReminderUri;
-    private int mYear, mMonth, mHour, mMinute, mDay;
+    private int mYear, mMonth, mHour, mMinute, mDay, mHourEnd, mMinuteEnd;
     private Calendar mCalendar;
-    private Button buttonTime;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,7 +76,7 @@ public class UpdateActivity extends AppCompatActivity implements LoaderManager.L
         editTextDosen = findViewById(R.id.editText_dosen);
         editTextRuangan = findViewById(R.id.editText_ruangan);
         editTextWaktu = findViewById(R.id.editText_waktu);
-        buttonTime = findViewById(R.id.button);
+        editTextWaktuSelesai = findViewById(R.id.editText_waktuSelesai);
 
         //setup matakuliah
         editTextMatakuliah.addTextChangedListener(new TextWatcher() {
@@ -107,6 +106,7 @@ public class UpdateActivity extends AppCompatActivity implements LoaderManager.L
         mDay = mCalendar.get(Calendar.DATE);
 
         mTime = mHour + ":" + mMinute;
+        mTimeEnd = mHourEnd + ":" + mMinuteEnd;
 
         //Toolbar
         mtoolbar = findViewById(R.id.toolbar);
@@ -120,14 +120,14 @@ public class UpdateActivity extends AppCompatActivity implements LoaderManager.L
         Log.i("DATE NOW",mDate);
 
         //get Time
-        buttonTime.setOnClickListener(new View.OnClickListener() {
+        editTextWaktu.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if(mCurrentReminderUri == null){
                     Toast.makeText(UpdateActivity.this, "click again on the reminder list to set time alarm", Toast.LENGTH_LONG).show();
                     return;
                 }
-                TimePickerDialog tpd = new TimePickerDialog(UpdateActivity.this, new TimePickerDialog.OnTimeSetListener() {
+                TimePickerDialog tpd = new TimePickerDialog(UpdateActivity.this, R.style.DialogTheme , new TimePickerDialog.OnTimeSetListener() {
                     @Override
                     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
                         mHour = hourOfDay;
@@ -147,7 +147,37 @@ public class UpdateActivity extends AppCompatActivity implements LoaderManager.L
                         editTextWaktu.setText(mTime);
                     }
                 },mHour,mMinute,true);
-                tpd.setTitle("Select Time");
+                tpd.show();
+            }
+        });
+
+        editTextWaktuSelesai.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(mCurrentReminderUri == null){
+                    Toast.makeText(UpdateActivity.this, "click again on the reminder list to set time alarm", Toast.LENGTH_LONG).show();
+                    return;
+                }
+                TimePickerDialog tpd = new TimePickerDialog(UpdateActivity.this, R.style.DialogTheme , new TimePickerDialog.OnTimeSetListener() {
+                    @Override
+                    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                        mHourEnd = hourOfDay;
+                        mMinuteEnd = minute;
+                        String fixMinute, fixHour;
+                        if (minute < 10) {
+                            fixMinute = "0" + minute;
+                        } else {
+                            fixMinute = String.valueOf(minute);
+                        }
+                        if (hourOfDay < 10) {
+                            fixHour = "0" +hourOfDay;
+                        }else{
+                            fixHour = String.valueOf(hourOfDay);
+                        }
+                        mTimeEnd = fixHour + ":" + fixMinute;
+                        editTextWaktuSelesai.setText(mTimeEnd);
+                    }
+                },mHourEnd,mMinuteEnd,true);
                 tpd.show();
             }
         });
@@ -235,6 +265,10 @@ public class UpdateActivity extends AppCompatActivity implements LoaderManager.L
         ruangan = editTextRuangan.getText().toString().trim();
         dosen = editTextDosen.getText().toString().trim();
         String cekjam = editTextWaktu.getText().toString().trim();
+        String cekjamSelesai = editTextWaktuSelesai.getText().toString().trim();
+
+//        mTime = editTextWaktu.getText().toString();
+//        mTimeEnd = editTextWaktuSelesai.getText().toString();
 
         if (TextUtils.isEmpty(mataKuliah) || TextUtils.isEmpty(hari) || TextUtils.isEmpty(dosen) || TextUtils.isEmpty(ruangan) || TextUtils.isEmpty(cekjam)) {
             Toast.makeText(this, "Isian tidak lengkap!", Toast.LENGTH_SHORT).show();
@@ -248,6 +282,7 @@ public class UpdateActivity extends AppCompatActivity implements LoaderManager.L
         values.put(JadwalContract.JadwalEntry.COLUMN_RUANGAN,ruangan);
         values.put(JadwalContract.JadwalEntry.COLUMN_TANGGAL,mDate);
         values.put(JadwalContract.JadwalEntry.COLUMN_WAKTU,mTime);
+        values.put(JadwalContract.JadwalEntry.COLUMN_WAKTU_SELESAI,mTimeEnd);
 
         //set Tanggal untuk notifikasi
         mCalendar.set(Calendar.MONTH, --mMonth);
@@ -260,7 +295,7 @@ public class UpdateActivity extends AppCompatActivity implements LoaderManager.L
         long selectedTimestamp =  mCalendar.getTimeInMillis();
         Log.i("zeitplan time miles", "saveSchedule: "+selectedTimestamp);
 
-        mRepeatTime = 1*milMinute;
+        mRepeatTime = 1*milWeek;
 
         if (mCurrentReminderUri == null){
             Uri newUri = getContentResolver().insert(JadwalContract.JadwalEntry.CONTENT_URI,values);
@@ -295,7 +330,8 @@ public class UpdateActivity extends AppCompatActivity implements LoaderManager.L
                 JadwalContract.JadwalEntry.COLUMN_DOSEN, dosen,
                 JadwalContract.JadwalEntry.COLUMN_RUANGAN, ruangan,
                 JadwalContract.JadwalEntry.COLUMN_TANGGAL, mDate,
-                JadwalContract.JadwalEntry.COLUMN_WAKTU, mTime
+                JadwalContract.JadwalEntry.COLUMN_WAKTU, mTime,
+                JadwalContract.JadwalEntry.COLUMN_WAKTU_SELESAI, mTimeEnd
         };
 
         return new CursorLoader(this, mCurrentReminderUri, projection, null, null, null);
@@ -311,12 +347,14 @@ public class UpdateActivity extends AppCompatActivity implements LoaderManager.L
             int mataKuliahColumnIndex = cursor.getColumnIndex(JadwalContract.JadwalEntry.COLUMN_MATAKULIAH);
             int ruanganColumnIndex = cursor.getColumnIndex(JadwalContract.JadwalEntry.COLUMN_RUANGAN);
             int waktuColumnIndex = cursor.getColumnIndex(JadwalContract.JadwalEntry.COLUMN_WAKTU);
+            int waktuSelesaiColumnIndex = cursor.getColumnIndex(JadwalContract.JadwalEntry.COLUMN_WAKTU_SELESAI);
             int dosenColumnIndex = cursor.getColumnIndex(JadwalContract.JadwalEntry.COLUMN_DOSEN);
             int hariColumnIndex = cursor.getColumnIndex(JadwalContract.JadwalEntry.COLUMN_HARI);
 
             String mataKuliah = cursor.getString(mataKuliahColumnIndex);
             String ruangan = cursor.getString(ruanganColumnIndex);
             String waktu = cursor.getString(waktuColumnIndex);
+            String waktuSelesai = cursor.getString(waktuSelesaiColumnIndex);
             String dosen = cursor.getString(dosenColumnIndex);
             String hari = cursor.getString(hariColumnIndex);
 
@@ -342,6 +380,7 @@ public class UpdateActivity extends AppCompatActivity implements LoaderManager.L
             editTextDosen.setText(dosen);
             editTextRuangan.setText(ruangan);
             editTextWaktu.setText(waktu);
+            editTextWaktuSelesai.setText(waktuSelesai);
         }
     }
 

@@ -25,6 +25,7 @@ public class JadwalDbHelper extends SQLiteOpenHelper {
                 JadwalContract.JadwalEntry.COLUMN_RUANGAN + " TEXT, " +
                 JadwalContract.JadwalEntry.COLUMN_TANGGAL + " TEXT, " +
                 JadwalContract.JadwalEntry.COLUMN_WAKTU + " TEXT, " +
+                JadwalContract.JadwalEntry.COLUMN_WAKTU_SELESAI + " TEXT, " +
                 JadwalContract.JadwalEntry.COLUMN_TIMESTAMP + " TIMESTAMP DEFAULT CURRENT_TIMESTAMP" +
                 ");";
 
