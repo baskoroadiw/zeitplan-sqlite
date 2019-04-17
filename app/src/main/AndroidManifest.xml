@@ -9,7 +9,7 @@
     <application
         android:name=".App"
         android:allowBackup="true"
-        android:icon="@mipmap/z_logo_new"
+        android:icon="@mipmap/zeitplan_new_logo"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"

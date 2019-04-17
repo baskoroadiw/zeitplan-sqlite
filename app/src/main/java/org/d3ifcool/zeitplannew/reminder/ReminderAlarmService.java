@@ -5,6 +5,7 @@ import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.Settings;
@@ -17,10 +18,14 @@ import org.d3ifcool.zeitplannew.R;
 import org.d3ifcool.zeitplannew.data.JadwalContract;
 
 import static org.d3ifcool.zeitplannew.App.CHANNEL_1_ID;
+import static org.d3ifcool.zeitplannew.FragmentSetting.SHARED_PREFS;
+import static org.d3ifcool.zeitplannew.FragmentSetting.SWITCH_NOTIFICATION;
 
 public class ReminderAlarmService extends IntentService {
 
     private static final String TAG = ReminderAlarmService.class.getSimpleName();
+
+    private boolean switchOnOff;
 
     private static final int NOTIFICATION_ID = 42;
     //This is a deep link intent, and needs the task stack
@@ -48,6 +53,9 @@ public class ReminderAlarmService extends IntentService {
                 .addNextIntentWithParentStack(action)
                 .getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
 
+        SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS,MODE_PRIVATE);
+        switchOnOff = sharedPreferences.getBoolean(SWITCH_NOTIFICATION,false);
+
         //Grab the task description
         Cursor cursor = getContentResolver().query(uri, null, null, null, null);
 
@@ -73,7 +81,9 @@ public class ReminderAlarmService extends IntentService {
                 .setCategory(NotificationCompat.CATEGORY_MESSAGE)
                 .setAutoCancel(true)
                 .build();
-
-        manager.notify(NOTIFICATION_ID, note);
+//        manager.notify(NOTIFICATION_ID, note);
+        if (switchOnOff == true){
+            manager.notify(NOTIFICATION_ID, note);
+        }
     }
 }
