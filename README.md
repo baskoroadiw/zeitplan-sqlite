@@ -36,5 +36,6 @@ changelog :
 - Add intent contact and feedback
 
 # zeitplan version-2.5
-> add function delete all schedule
-> add animation intent
+changelog :
+- add function delete all schedule
+- add animation intent
