@@ -30,6 +30,8 @@ import org.d3ifcool.zeitplannew.reminder.AlarmScheduler;
 
 import java.util.Calendar;
 
+import maes.tech.intentanim.CustomIntent;
+
 public class AddActivity extends AppCompatActivity {
 
     //constant values in milliseconds
@@ -157,6 +159,12 @@ public class AddActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    @Override
+    public void finish() {
+        super.finish();
+        CustomIntent.customType(this,"fadein-to-fadeout");
     }
 
     @Override

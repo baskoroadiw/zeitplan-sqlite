@@ -1,9 +1,13 @@
 package org.d3ifcool.zeitplannew;
 
+import android.app.AlertDialog;
 import android.content.ComponentName;
+import android.content.ContentUris;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -21,6 +25,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.github.aakira.expandablelayout.ExpandableRelativeLayout;
+
+import org.d3ifcool.zeitplannew.data.JadwalContract;
+import org.d3ifcool.zeitplannew.reminder.AlarmScheduler;
+
+import java.util.ArrayList;
 
 public class FragmentSetting extends Fragment {
 
@@ -42,6 +51,14 @@ public class FragmentSetting extends Fragment {
     Boolean rotateArrowContact;
     //End of Contact Card
 
+    //Start of Other Card
+    ConstraintLayout CardOther;
+    ExpandableRelativeLayout exOther;
+    ImageView arrowOther;
+    Boolean rotateArrowOther;
+    //End of Other Card
+
+    TextView otherDelete;
     TextView toasts;
     Switch switchNotification;
     TextView contactEmail, contactWhatsapp, contactWhatsapp2, contactWhatsapp3;
@@ -97,6 +114,35 @@ public class FragmentSetting extends Fragment {
             }
         });
         //End of Contact Card
+
+        //Start of Other Card
+        exOther = (ExpandableRelativeLayout) view.findViewById(R.id.expand_other); //mencari expandnya
+        exOther.collapse(); //untuk men-set agar awal dijalankan expandnya tertutup
+        CardOther = (ConstraintLayout) view.findViewById(R.id.card_other); //mencari card yanag akan dijadikan trigger onClick
+        arrowOther = (ImageView) view.findViewById(R.id.arrow_other); //mencari arrow
+        rotateArrowOther = false;
+        CardOther.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) { //set onClick pada Card nya
+                exOther.toggle(); //fungsi toggle agar otomastis expand terbuka & tertutup bergantian
+                if (rotateArrowOther == false){
+                    arrowOther.setRotation(180); //men-rotate arrow 180 derajat
+                    rotateArrowOther = true;
+                }else{
+                    arrowOther.setRotation(0); //men-rotate arrow jadi normal
+                    rotateArrowOther = false;
+                }
+            }
+        });
+        //End of Other Card
+
+        otherDelete = view.findViewById(R.id.other_delete);
+        otherDelete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                deleteAllSchedule();
+            }
+        });
 
         toasts = view.findViewById(R.id.feedback_email);
         toasts.setOnClickListener(new View.OnClickListener(){
@@ -251,5 +297,58 @@ public class FragmentSetting extends Fragment {
         }catch (Exception e){
             return;
         }
+    }
+
+    private void deleteAllSchedule(){
+        String [] projection = {JadwalContract.JadwalEntry._ID};
+        Cursor cursor = appContext.getContentResolver().query(JadwalContract.JadwalEntry.CONTENT_URI,projection,null,null,null);
+        if (cursor.moveToNext()){
+            dialogDeleteAll();
+        }else{
+            return;
+        }
+    }
+
+    private void dialogDeleteAll(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setMessage("Yakin ingin menghapus semua jadwal?");
+        builder.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                // User clicked the "Delete" button, so delete the reminder.
+                Uri allUri = null;
+                ArrayList<Uri> arrayUri = new ArrayList<>();
+                String [] projection = {JadwalContract.JadwalEntry._ID};
+                Cursor cursor = appContext.getContentResolver().query(JadwalContract.JadwalEntry.CONTENT_URI,projection,null,null,null);
+                while (cursor.moveToNext()){
+                    long idUri = cursor.getLong(cursor.getColumnIndex(JadwalContract.JadwalEntry._ID));
+                    allUri = ContentUris.withAppendedId(JadwalContract.JadwalEntry.CONTENT_URI, idUri);
+                    arrayUri.add(allUri);
+                }
+
+                int rowDeleted = appContext.getContentResolver().delete(JadwalContract.JadwalEntry.CONTENT_URI,null,null);
+                for (int i=0;i<arrayUri.size();i++){
+                    new AlarmScheduler().cancelAlarm(appContext,arrayUri.get(i));
+                }
+
+                if (rowDeleted == 0){
+                    Toast.makeText(appContext, "Error Delete Schedule", Toast.LENGTH_SHORT).show();
+                }else{
+                    Toast.makeText(appContext, "All Schedule Deleted", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                // User clicked the "Cancel" button, so dismiss the dialog
+                // and continue editing the reminder.
+                if (dialog != null) {
+                    dialog.dismiss();
+                }
+            }
+        });
+
+        // Create and show the AlertDialog
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
     }
 }

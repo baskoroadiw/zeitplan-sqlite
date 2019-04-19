@@ -18,6 +18,8 @@ import org.d3ifcool.zeitplannew.data.JadwalContract;
 
 import java.util.ArrayList;
 
+import maes.tech.intentanim.CustomIntent;
+
 public class DetailAdapter extends RecyclerView.Adapter<DetailAdapter.ViewHolder> {
 
     Context mContext;
@@ -70,6 +72,7 @@ public class DetailAdapter extends RecyclerView.Adapter<DetailAdapter.ViewHolder
                 intent.setData(currentZeitplanUri);
 
                 mContext.startActivity(intent);
+                CustomIntent.customType(mContext,"fadein-to-fadeout");
             }
         });
     }

@@ -18,6 +18,8 @@ import android.widget.Toast;
 
 import org.d3ifcool.zeitplannew.data.JadwalContract;
 
+import maes.tech.intentanim.CustomIntent;
+
 public class FragmentSchedule extends Fragment {
 
     public FragmentSchedule() {}
@@ -64,6 +66,7 @@ public class FragmentSchedule extends Fragment {
                 Intent intent = new Intent(appContext,ScheduleActivity.class);
                 intent.putExtra("hari","Senin");
                 startActivity(intent);
+                CustomIntent.customType(getContext(),"left-to-right");
             }
         });
 
@@ -73,6 +76,7 @@ public class FragmentSchedule extends Fragment {
                 Intent intent = new Intent(appContext,ScheduleActivity.class);
                 intent.putExtra("hari","Selasa");
                 startActivity(intent);
+                CustomIntent.customType(getContext(),"left-to-right");
             }
         });
 
@@ -82,6 +86,7 @@ public class FragmentSchedule extends Fragment {
                 Intent intent = new Intent(appContext,ScheduleActivity.class);
                 intent.putExtra("hari","Rabu");
                 startActivity(intent);
+                CustomIntent.customType(getContext(),"left-to-right");
             }
         });
 
@@ -91,6 +96,7 @@ public class FragmentSchedule extends Fragment {
                 Intent intent = new Intent(appContext,ScheduleActivity.class);
                 intent.putExtra("hari","Kamis");
                 startActivity(intent);
+                CustomIntent.customType(getContext(),"left-to-right");
             }
         });
 
@@ -100,6 +106,7 @@ public class FragmentSchedule extends Fragment {
                 Intent intent = new Intent(appContext,ScheduleActivity.class);
                 intent.putExtra("hari","Jumat");
                 startActivity(intent);
+                CustomIntent.customType(getContext(),"left-to-right");
             }
         });
 
@@ -109,6 +116,7 @@ public class FragmentSchedule extends Fragment {
                 Intent intent = new Intent(appContext,ScheduleActivity.class);
                 intent.putExtra("hari","Sabtu");
                 startActivity(intent);
+                CustomIntent.customType(getContext(),"left-to-right");
             }
         });
 
@@ -117,6 +125,7 @@ public class FragmentSchedule extends Fragment {
             public void onClick(View v) {
                 Intent intent = new Intent(appContext,AddActivity.class);
                 startActivity(intent);
+                CustomIntent.customType(getContext(),"fadein-to-fadeout");
             }
         });
 

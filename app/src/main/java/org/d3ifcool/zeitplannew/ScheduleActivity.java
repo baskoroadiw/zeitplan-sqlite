@@ -8,6 +8,8 @@ import android.support.v7.widget.RecyclerView;
 import android.widget.TextView;
 import org.d3ifcool.zeitplannew.data.JadwalContract;
 
+import maes.tech.intentanim.CustomIntent;
+
 public class ScheduleActivity extends AppCompatActivity {
 
     String hari;
@@ -28,6 +30,12 @@ public class ScheduleActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.recyclerViewDetail);
 
         showData();
+    }
+
+    @Override
+    public void finish() {
+        super.finish();
+        CustomIntent.customType(this,"right-to-left");
     }
 
     @Override

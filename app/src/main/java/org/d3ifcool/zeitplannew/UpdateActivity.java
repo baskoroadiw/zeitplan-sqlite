@@ -34,6 +34,8 @@ import org.d3ifcool.zeitplannew.reminder.AlarmScheduler;
 
 import java.util.Calendar;
 
+import maes.tech.intentanim.CustomIntent;
+
 public class UpdateActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private static final int EXISTING_ZEITPLAN_LOADER = 0;
@@ -182,6 +184,12 @@ public class UpdateActivity extends AppCompatActivity implements LoaderManager.L
             }
         });
 
+    }
+
+    @Override
+    public void finish() {
+        super.finish();
+        CustomIntent.customType(this,"fadein-to-fadeout");
     }
 
     @Override
