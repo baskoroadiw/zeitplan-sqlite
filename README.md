@@ -16,3 +16,25 @@ changelog :
 changelog : 
 - Add query see all schedule based day
 - Fixing bug (force close if add data but not complete)
+
+# zeitplan version-2.2
+changelog :
+- Fixing application concept (Add schedule in schedule fragment)
+- Only display today schedule in main fragment
+- See all schedule in schedule fragment
+- Add and update schedule in schedule fragment
+
+# zeitplan version-2.3
+changelog :
+- Add waktu_selesai in zeitplan table
+- Add function upcomming schedule
+
+# zeitplan version-2.4
+changelog :
+- Add fragment setting
+- Add function turn on/off notification
+- Add intent contact and feedback
+
+# zeitplan version-2.5
+> add function delete all schedule
+> add animation intent
