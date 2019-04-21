@@ -8,6 +8,8 @@ import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 
+import maes.tech.intentanim.CustomIntent;
+
 public class MainActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener {
 
     public static Context contextOfApplication;
@@ -28,7 +30,27 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         navigation.setOnNavigationItemSelectedListener(this);
 
         loadFragment(new FragmentMain());
+
+//        CustomIntent.customType(this,"fadein-to-fadeout");
     }
+
+//    @Override
+//    protected void onStart() {
+//        super.onStart();
+//        CustomIntent.customType(this,"fadein-to-fadeout");
+//    }
+//
+//    @Override
+//    protected void onPause() {
+//        super.onPause();
+//        CustomIntent.customType(this,"fadein-to-fadeout");
+//    }
+//
+//    @Override
+//    public void finish() {
+//        super.finish();
+//        CustomIntent.customType(this,"fadein-to-fadeout");
+//    }
 
     private boolean loadFragment(Fragment fragment) {
         if (fragment != null) {

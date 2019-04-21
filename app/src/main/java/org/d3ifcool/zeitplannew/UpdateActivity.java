@@ -189,7 +189,7 @@ public class UpdateActivity extends AppCompatActivity implements LoaderManager.L
     @Override
     public void finish() {
         super.finish();
-        CustomIntent.customType(this,"fadein-to-fadeout");
+        CustomIntent.customType(this,"up-to-bottom");
     }
 
     @Override

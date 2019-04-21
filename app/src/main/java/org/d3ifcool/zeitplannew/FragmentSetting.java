@@ -307,6 +307,7 @@ public class FragmentSetting extends Fragment {
         }else{
             return;
         }
+        cursor.close();
     }
 
     private void dialogDeleteAll(){

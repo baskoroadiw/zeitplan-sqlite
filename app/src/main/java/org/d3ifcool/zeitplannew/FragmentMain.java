@@ -226,5 +226,6 @@ public class FragmentMain extends Fragment implements LoaderManager.LoaderCallba
             tvDetailRuangan.setVisibility(View.GONE);
             tvDetailWaktu.setVisibility(View.GONE);
         }
+        cursor.close();
     }
 }
