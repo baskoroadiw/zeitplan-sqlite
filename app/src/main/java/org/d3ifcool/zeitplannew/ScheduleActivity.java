@@ -5,6 +5,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.TextView;
 import org.d3ifcool.zeitplannew.data.JadwalContract;
 
@@ -12,10 +15,11 @@ import maes.tech.intentanim.CustomIntent;
 
 public class ScheduleActivity extends AppCompatActivity {
 
-    String hari;
-    TextView tvJudul;
-    DetailAdapter mAdapter;
-    RecyclerView recyclerView;
+    private String hari;
+    private TextView tvJudul;
+    private DetailAdapter mAdapter;
+    private RecyclerView recyclerView;
+    private Toolbar mToolbar;
 
 
     @Override
@@ -29,7 +33,24 @@ public class ScheduleActivity extends AppCompatActivity {
 
         recyclerView = findViewById(R.id.recyclerViewDetail);
 
+        mToolbar = findViewById(R.id.toolbarDetail);
+        setSupportActionBar(mToolbar);
+        getSupportActionBar().setTitle(R.string.title_activity_detail);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeButtonEnabled(true);
+        getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_chevron_left_black_24dp);
+
         showData();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case android.R.id.home:
+                onBackPressed();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override

@@ -72,7 +72,7 @@ public class DetailAdapter extends RecyclerView.Adapter<DetailAdapter.ViewHolder
                 intent.setData(currentZeitplanUri);
 
                 mContext.startActivity(intent);
-                CustomIntent.customType(mContext,"bottom-to-up");
+                CustomIntent.customType(mContext,"fadein-to-fadeout");
             }
         });
     }

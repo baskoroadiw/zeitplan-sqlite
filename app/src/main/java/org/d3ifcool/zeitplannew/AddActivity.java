@@ -1,6 +1,7 @@
 package org.d3ifcool.zeitplannew;
 
 import android.app.TimePickerDialog;
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.net.Uri;
@@ -30,9 +31,12 @@ import org.d3ifcool.zeitplannew.reminder.AlarmScheduler;
 
 import java.util.Calendar;
 
+import es.dmoral.toasty.Toasty;
 import maes.tech.intentanim.CustomIntent;
 
 public class AddActivity extends AppCompatActivity {
+
+//    private long currentId;
 
     //constant values in milliseconds
     private static final long milMinute = 60000L;
@@ -41,12 +45,12 @@ public class AddActivity extends AppCompatActivity {
     private static final long milWeek = 604800000L;
     private static final long milMonth = 2592000000L;
 
-    Toolbar mtoolbar;
+    private Toolbar mtoolbar;
     private Spinner spinnerHari;
     private EditText editTextMatakuliah, editTextDosen, editTextRuangan, editTextWaktu, editTextWaktuSelesai;
     private String mataKuliah, dosen, ruangan, hari, mDate, mTime, mTimeEnd;
     private long mRepeatTime;
-    TimePicker timePicker;
+    private TimePicker timePicker;
     private int mYear, mMonth, mHour, mMinute, mDay, mHourEnd, mMinuteEnd;
     private Calendar mCalendar;
 
@@ -54,6 +58,8 @@ public class AddActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add);
+
+//        getCurrentId();
 
         //initialize View
         spinnerHari = findViewById(R.id.spinnerHari);
@@ -99,6 +105,7 @@ public class AddActivity extends AppCompatActivity {
         getSupportActionBar().setTitle(R.string.title_activity_add);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
+        getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_chevron_left_black_24dp);
 
         //get Date
         mDate = mDay + "/" +mMonth+ "/" +mYear;
@@ -164,7 +171,7 @@ public class AddActivity extends AppCompatActivity {
     @Override
     public void finish() {
         super.finish();
-        CustomIntent.customType(this,"fadein-to-fadeout");
+        CustomIntent.customType(this,"up-to-bottom");
     }
 
     @Override
@@ -184,11 +191,24 @@ public class AddActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case R.id.save_reminder:
-                saveSchedule();
-                finish();
+                hari = spinnerHari.getSelectedItem().toString().trim();
+                mataKuliah = editTextMatakuliah.getText().toString().trim();
+                ruangan = editTextRuangan.getText().toString().trim();
+                dosen = editTextDosen.getText().toString().trim();
+                String cekjam = editTextWaktu.getText().toString().trim();
+                String cekjamSelesai = editTextWaktuSelesai.getText().toString().trim();
+                if (TextUtils.isEmpty(hari)||TextUtils.isEmpty(mataKuliah)||TextUtils.isEmpty(ruangan)||TextUtils.isEmpty(dosen)||
+                TextUtils.isEmpty(cekjam)||TextUtils.isEmpty(cekjamSelesai)){
+
+                    Toasty.warning(this, "Data tidak lengkap",Toasty.LENGTH_SHORT).show();
+                }else{
+                    saveSchedule();
+                    finish();
+                }
                 return true;
             case android.R.id.home:
-                NavUtils.navigateUpFromSameTask(AddActivity.this);
+                onBackPressed();
+                return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -202,10 +222,6 @@ public class AddActivity extends AppCompatActivity {
         dosen = editTextDosen.getText().toString().trim();
         String cekjam = editTextWaktu.getText().toString().trim();
         String cekjamSelesai = editTextWaktuSelesai.getText().toString().trim();
-
-        if (TextUtils.isEmpty(mataKuliah) || TextUtils.isEmpty(hari) || TextUtils.isEmpty(dosen) || TextUtils.isEmpty(ruangan) || TextUtils.isEmpty(cekjam)) {
-            Toast.makeText(this, "Isian tidak lengkap!", Toast.LENGTH_SHORT).show();
-        }
 
         ContentValues values = new ContentValues();
 
@@ -235,8 +251,20 @@ public class AddActivity extends AppCompatActivity {
                 Toast.makeText(this, "Error Saving Schedule", Toast.LENGTH_SHORT).show();
             }
 
-        new AlarmScheduler().setRepeatAlarm(getApplicationContext(),selectedTimestamp, JadwalContract.JadwalEntry.CONTENT_URI,mRepeatTime);
+        new AlarmScheduler().setRepeatAlarm(this,selectedTimestamp, JadwalContract.JadwalEntry.CONTENT_URI,mRepeatTime);
 
-        Toast.makeText(getApplicationContext(), "Schedule Saved", Toast.LENGTH_SHORT).show();
+        Toasty.success(this,"Schedule Saved",Toasty.LENGTH_SHORT).show();
     }
+
+//    private void getCurrentId(){
+//        String [] projection = {JadwalContract.JadwalEntry._ID};
+//        Cursor cursor = getContentResolver().query(JadwalContract.JadwalEntry.CONTENT_URI,projection,null,null,null);
+//        if (cursor.moveToNext()){
+//            currentId = cursor.getLong(cursor.getColumnIndex(JadwalContract.JadwalEntry._ID)) + 1;
+//        }else{
+//            return;
+//        }
+//        cursor.close();
+//        Log.i("Current ID",String.valueOf(currentId));
+//    }
 }

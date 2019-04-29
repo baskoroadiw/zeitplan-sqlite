@@ -34,6 +34,7 @@ import org.d3ifcool.zeitplannew.reminder.AlarmScheduler;
 
 import java.util.Calendar;
 
+import es.dmoral.toasty.Toasty;
 import maes.tech.intentanim.CustomIntent;
 
 public class UpdateActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
@@ -64,7 +65,7 @@ public class UpdateActivity extends AppCompatActivity implements LoaderManager.L
 
         Intent intent = getIntent();
         mCurrentReminderUri = intent.getData();
-        Log.i("URII", mCurrentReminderUri.toString());
+//        Log.i("URII", mCurrentReminderUri.toString());
 
         if (mCurrentReminderUri == null) {
             invalidateOptionsMenu();
@@ -116,10 +117,11 @@ public class UpdateActivity extends AppCompatActivity implements LoaderManager.L
         getSupportActionBar().setTitle(R.string.title_activity_update);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
+        getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_chevron_left_black_24dp);
 
         //get Date
         mDate = mDay + "/" +mMonth+ "/" +mYear;
-        Log.i("DATE NOW",mDate);
+//        Log.i("DATE NOW",mDate);
 
         //get Time
         editTextWaktu.setOnClickListener(new View.OnClickListener() {
@@ -189,7 +191,7 @@ public class UpdateActivity extends AppCompatActivity implements LoaderManager.L
     @Override
     public void finish() {
         super.finish();
-        CustomIntent.customType(this,"up-to-bottom");
+        CustomIntent.customType(this,"fadein-to-fadeout");
     }
 
     @Override
@@ -213,15 +215,26 @@ public class UpdateActivity extends AppCompatActivity implements LoaderManager.L
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case R.id.save_reminder:
-                saveSchedule();
-                finish();
-//                Log.i("TIMEEEEE",mTime);
+                hari = spinnerHari.getSelectedItem().toString().trim();
+                mataKuliah = editTextMatakuliah.getText().toString().trim();
+                ruangan = editTextRuangan.getText().toString().trim();
+                dosen = editTextDosen.getText().toString().trim();
+                String cekjam = editTextWaktu.getText().toString().trim();
+                String cekjamSelesai = editTextWaktuSelesai.getText().toString().trim();
+                if (TextUtils.isEmpty(hari)||TextUtils.isEmpty(mataKuliah)||TextUtils.isEmpty(ruangan)||TextUtils.isEmpty(dosen)||
+                        TextUtils.isEmpty(cekjam)||TextUtils.isEmpty(cekjamSelesai)){
+                    Toasty.warning(this, "Data tidak lengkap",Toasty.LENGTH_SHORT).show();
+                }else{
+                    saveSchedule();
+                    finish();
+                }
                 return true;
             case R.id.delete_reminder:
                 showDeleteConfirmationDialog();
                 return true;
             case android.R.id.home:
-                NavUtils.navigateUpFromSameTask(UpdateActivity.this);
+                onBackPressed();
+                return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -256,9 +269,9 @@ public class UpdateActivity extends AppCompatActivity implements LoaderManager.L
             new AlarmScheduler().cancelAlarm(this,mCurrentReminderUri);
 
             if (rowsDeleted == 0){
-                Toast.makeText(this, "Error Deleting", Toast.LENGTH_SHORT).show();
+                Toasty.error(this,"Error Delete Schedule",Toasty.LENGTH_SHORT).show();
             }else{
-                Toast.makeText(this, "Schedule Deleted", Toast.LENGTH_SHORT).show();
+                Toasty.success(this,"Schedule Deleted", Toasty.LENGTH_SHORT).show();
             }
         }
 
@@ -325,7 +338,7 @@ public class UpdateActivity extends AppCompatActivity implements LoaderManager.L
         
         new AlarmScheduler().setRepeatAlarm(getApplicationContext(),selectedTimestamp,mCurrentReminderUri,mRepeatTime);
 
-        Toast.makeText(getApplicationContext(), "Saved", Toast.LENGTH_SHORT).show();
+        Toasty.success(this,"Schedule Updated",Toasty.LENGTH_SHORT).show();
     }
 
     @NonNull

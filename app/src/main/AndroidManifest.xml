@@ -16,18 +16,10 @@
         android:theme="@style/AppTheme">
         <activity android:name=".ScheduleActivity"></activity>
         <activity
-            android:name=".UpdateActivity"
-            android:parentActivityName=".MainActivity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="org.d3ifcool.zeitplannew.MainActivity" />
+            android:name=".UpdateActivity">
         </activity>
         <activity
-            android:name=".AddActivity"
-            android:parentActivityName=".MainActivity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="org.d3ifcool.zeitplannew.MainActivity" />
+            android:name=".AddActivity">
         </activity>
         <activity
             android:name=".MainActivity"

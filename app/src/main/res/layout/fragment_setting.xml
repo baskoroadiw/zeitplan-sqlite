@@ -147,7 +147,7 @@
                 android:layout_marginTop="16dp"
                 android:layout_marginBottom="16dp"
                 android:fontFamily="@font/poppins_regular"
-                android:text="Notification"
+                android:text="Notifikasi"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -183,7 +183,7 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="16dp"
                 android:fontFamily="@font/poppins_regular"
-                android:text="Contact"
+                android:text="Kontak"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -337,7 +337,7 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="16dp"
                 android:fontFamily="@font/poppins_regular"
-                android:text="Other"
+                android:text="Lain-lain"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -373,7 +373,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginStart="8dp"
                             android:fontFamily="@font/poppins_medium"
-                            android:text="Delete All Schedule"
+                            android:text="Hapus Semua Jadwal"
                             app:layout_constraintBottom_toBottomOf="@+id/image_delete"
                             app:layout_constraintStart_toEndOf="@+id/image_delete"
                             app:layout_constraintTop_toTopOf="@+id/image_delete" />

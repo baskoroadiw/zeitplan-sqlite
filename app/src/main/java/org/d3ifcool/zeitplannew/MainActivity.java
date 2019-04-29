@@ -34,24 +34,6 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 //        CustomIntent.customType(this,"fadein-to-fadeout");
     }
 
-//    @Override
-//    protected void onStart() {
-//        super.onStart();
-//        CustomIntent.customType(this,"fadein-to-fadeout");
-//    }
-//
-//    @Override
-//    protected void onPause() {
-//        super.onPause();
-//        CustomIntent.customType(this,"fadein-to-fadeout");
-//    }
-//
-//    @Override
-//    public void finish() {
-//        super.finish();
-//        CustomIntent.customType(this,"fadein-to-fadeout");
-//    }
-
     private boolean loadFragment(Fragment fragment) {
         if (fragment != null) {
 

@@ -31,6 +31,8 @@ import org.d3ifcool.zeitplannew.reminder.AlarmScheduler;
 
 import java.util.ArrayList;
 
+import es.dmoral.toasty.Toasty;
+
 public class FragmentSetting extends Fragment {
 
     public FragmentSetting() {}
@@ -221,7 +223,7 @@ public class FragmentSetting extends Fragment {
 
     private void loadPrefereces(){
         SharedPreferences sharedPreferences = appContext.getSharedPreferences(SHARED_PREFS,Context.MODE_PRIVATE);
-        switchOnOff = sharedPreferences.getBoolean(SWITCH_NOTIFICATION,false);
+        switchOnOff = sharedPreferences.getBoolean(SWITCH_NOTIFICATION,true);
 //        Log.d("LoadPreferences",String.valueOf(switchOnOff));
     }
 
@@ -332,9 +334,9 @@ public class FragmentSetting extends Fragment {
                 }
 
                 if (rowDeleted == 0){
-                    Toast.makeText(appContext, "Error Delete Schedule", Toast.LENGTH_SHORT).show();
+                    Toasty.error(appContext,"Error Delete Schedule",Toasty.LENGTH_SHORT).show();
                 }else{
-                    Toast.makeText(appContext, "All Schedule Deleted", Toast.LENGTH_SHORT).show();
+                    Toasty.success(appContext,"All Schedule Deleted",Toasty.LENGTH_SHORT).show();
                 }
             }
         });

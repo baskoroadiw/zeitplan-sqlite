@@ -125,7 +125,7 @@ public class FragmentSchedule extends Fragment {
             public void onClick(View v) {
                 Intent intent = new Intent(appContext,AddActivity.class);
                 startActivity(intent);
-                CustomIntent.customType(getContext(),"fadein-to-fadeout");
+                CustomIntent.customType(getContext(),"bottom-to-up");
             }
         });
 
