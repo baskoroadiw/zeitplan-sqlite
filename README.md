@@ -1,5 +1,5 @@
 # zeitplan
-Aplikasi pengingat jadwal kuliah
+Aplikasi Pengingat Jadwal Kuliah Berbasis Android Java SQlite
 
 # zeitplan version-1
 changelog :
