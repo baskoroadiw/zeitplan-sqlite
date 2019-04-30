@@ -39,3 +39,10 @@ changelog :
 changelog :
 - add function delete all schedule
 - add animation intent
+
+# zeitplan version-2.6
+changelog :
+- fixing languange
+- fixing backButton in toolbar
+- fixing validation insert data
+- add toolbar in schedule activity
