@@ -1,5 +1,5 @@
 # zeitplan
-Aplikasi Proyek Tingkat 2 Semester 4
+Aplikasi pengingat jadwal kuliah
 
 # zeitplan version-1
 changelog :
